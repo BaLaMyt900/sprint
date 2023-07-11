@@ -1,4 +1,4 @@
-dbname = 'postgres'
+FSTR_DB_NAME = 'postgres'
 FSTR_DB_LOGIN = 'postgres'
 FSTR_DB_PASS = 'postgres'
 FSTR_DB_HOST = '127.0.0.1'
