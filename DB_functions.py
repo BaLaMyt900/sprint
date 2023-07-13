@@ -75,28 +75,33 @@ class Db:
         cur.close()
         conn.close()
 
-    def submitdata(self, data: dict):
+    def submitdata(self, data):  # TODO Проверка на JSON на входе
         """ Принятие новых данных """
-        self.makeconnection()
-        print(dict(data))
-        print(data['title'])
-        # Добавление фотографий
-        images = data.images
-        for image in images:
-            self.cur.execute('''INSERT INTO pereval_images (title, img) VALUES (?,?) RETURNING id''',
-                             (image['title'], image['data']))
-            image = self.cur.fetchone()
+        # self.makeconnection()
+        print(data)
+        print(type(data))
+        # Добавление фотографий TODO Асинхронный ввод фотографий в БД
+        # images = data.images
+        # for image in images:
+        #     self.cur.execute('''INSERT INTO pereval_images (title, img) VALUES (?,?) RETURNING id''',
+        #                      (image['title'], image['data']))
+        #     image = self.cur.fetchone()
 
         # Добавление координат
-        self.cur.execute('''INSERT INTO Coords (latitude, longitude, height) VALUES (?, ?, ?) RETURNING id''',
-                         (data['coords']['latitude'], data['coords']['longitude'], data['coords']['height']))
-        coords_id = self.cur.fetchone()
+        # self.cur.execute('''INSERT INTO Coords (latitude, longitude, height) VALUES (?, ?, ?) RETURNING id''',
+        #                  (data['coords']['latitude'], data['coords']['longitude'], data['coords']['height']))
+        # coords_id = self.cur.fetchone()
+        #
+        # # Поиск или добавление пользователя TODO Прокверка ния пользователя иили добавление в БД
+        # self.cur.execute(f'''SELECT id FROM Users WHERE email ={data['user']['email']}''')
+        # user_id = self.cur.fetchone()
+        #
+        # if user_id:
+        #     self.cur.execute(''' INSERT INTO pereval_added (beautyTitle, title, others_titles, connect, user
+        #     images, coords) VALUES (?,?,?,?,?,?)''', (data['beauty_title'], data['title'], data['others_titles'],
+        #                                               data['connect'], user_id, images, coords_id))
 
-        # Поиск или добавление пользователя
-        self.cur.execute(f'''SELECT id FROM Users WHERE email ={data['user']['email']}''')
-        user_id = self.cur.fetchone()
 
-        if user_id:
-            self.cur.execute(''' INSERT INTO pereval_added (beautyTitle, title, others_titles, connect, user
-            images, coords) VALUES (?,?,?,?,?,?)''', (data['beauty_title'], data['title'], data['others_titles'],
-                                                      data['connect'], user_id, images, coords_id))
+
+        # TODO асинхронная отправка работ с БД, сбор в единый ответ и ответ пользователю PROMISE
+        # ПОИСК ФРЕЙМВОКОВ ДЛЯ РАБОТЫ С БД
