@@ -1,22 +1,13 @@
 from fastapi import FastAPI
 from DB_functions import Db
 from Data_class import Data
+from fastapi.responses import JSONResponse
+
 
 db = Db()
 app = FastAPI()
 
 
-@app.post('/submitData')
+@app.post('/submitData', response_model=Data)
 async def submitData(data: Data):
-    return db.submitdata(data)
-
-
-@app.get("/")
-async def root():
-    print('success')
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
-
+    return JSONResponse(db.submitdata(data))

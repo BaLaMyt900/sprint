@@ -47,4 +47,3 @@ class Data(BaseModel):
     coords: Coords
     level: Level
     images: Images
-
