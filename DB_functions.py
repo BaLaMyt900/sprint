@@ -11,12 +11,14 @@ class Db:
 
     def __init__(self):
         """ Создание таблиц в базе данных """
-        self.conn = psycopg2.connect(dbname=FSTR_DB_NAME, user=FSTR_DB_LOGIN, password=FSTR_DB_PASS, host=FSTR_DB_HOST,
-                                     port=FSTR_DB_PORT)
-        self.conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        self.cur = self.conn.cursor()
+
+        try:
+            self.makeconnection()
+        except (Exception, Error) as error:
+            raise Error('Ошибка подключения к базе данных')
+
         """ Создание таблицы Users """
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS Users 
+        self.cur.execute('''CREATE TABLE IF NOT EXISTS Users
                         (
                             id serial PRIMARY KEY,
                             email text UNIQUE,
@@ -79,7 +81,8 @@ class Db:
             self.conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
             self.cur = self.conn.cursor()
         except (Exception, Error) as error:
-            return {'status': 500, 'message': f'Ошибка подключения к базе данных - {error}', 'id': None}
+            raise error
+
 
     def stopconnection(self):
         """ Функция разрыва соединения с базой данных """
@@ -88,8 +91,14 @@ class Db:
 
     def submitdata(self, data: Data):
         """ Принятие новых данных """
-        self.makeconnection()
+
+        try:
+            self.makeconnection()
+        except (Exception, Error) as error:
+            return {'status': 500, 'message': f'Ошибка подключения к базе данных - {error}', 'id': None}
+
         # Добавление фотографий
+
         images_id = []
         for image in data.images.root:
             self.cur.execute('''INSERT INTO pereval_images (title, img) VALUES (%s, %s) RETURNING id''',
@@ -97,17 +106,20 @@ class Db:
             images_id.append(self.cur.fetchone())
 
         # Добавление координат
+
         self.cur.execute('''INSERT INTO Coords (latitude, longitude, height) VALUES (%s, %s, %s) RETURNING id''',
                          (data.coords.latitude, data.coords.longitude, data.coords.height,))
         coords_id = self.cur.fetchone()
 
         # Поиск или добавление пользователя
+
         self.cur.execute(f'''SELECT id FROM Users WHERE email = %s''', (data.user.email,))
         user_id = self.cur.fetchone()
 
         # Добавление информации в pereval_added
+
         if user_id:  # Если пользователь найдет, добавление с имеющимся ИД
-            self.cur.execute(''' INSERT INTO pereval_added (beautyTitle, title, others_titles, connect, user,
+            self.cur.execute(''' INSERT INTO pereval_added (beautyTitle, title, others_titles, connect, user_id,
             coords) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id''',
                              (data.beauty_title, data.title, data.other_titles,
                               data.connect, user_id,
