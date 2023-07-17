@@ -14,7 +14,7 @@ class Db:
         """ Создание таблиц в базе данных """
 
         try:
-            self.makeconnection()
+            self.makeConnection()
         except (Exception, Error):
             raise Error('Ошибка подключения к базе данных')
 
@@ -29,10 +29,10 @@ class Db:
 
         """ Создание таблицы pereval_added """
         self.cur.execute(ADD_DATA)
-        self.cur.close()
-        self.conn.close()
 
-    def makeconnection(self):
+        self.stopConnection()
+
+    def makeConnection(self):
         """ Функция создания соединения с базой данных"""
         try:
             self.conn = psycopg2.connect(dbname=FSTR_DB_NAME, user=FSTR_DB_LOGIN, password=FSTR_DB_PASS,
@@ -43,7 +43,7 @@ class Db:
         except (Exception, Error) as error:
             raise error
 
-    def stopconnection(self):
+    def stopConnection(self):
         """ Функция разрыва соединения с базой данных """
         self.cur.close()
         self.conn.close()
@@ -52,7 +52,7 @@ class Db:
         """ Принятие новых данных """
 
         try:
-            self.makeconnection()
+            self.makeConnection()
         except (Exception, Error) as error:
             return JSONResponse({'status': 500, 'message': f'Ошибка подключения к базе данных - {error}', 'id': None})
 
@@ -97,20 +97,21 @@ class Db:
             for img_id, image_id in enumerate(images_id):
                 self.cur.execute(UPDATE_DATA_ADD_IMAGE_BY_IMG_ID, (img_id, image_id, object_id))
 
-        self.stopconnection()
+        self.stopConnection()
 
         return JSONResponse({'status': 200, 'message': None, 'id': object_id})
 
     def getData(self, data_id: int):
         """ Функция получения данных из базы """
-        self.makeconnection()
+        self.makeConnection()
         self.cur.execute(SELECT_DATA_BY_ID_FOR_GET_REQUEST, (data_id,))
         data = self.cur.fetchone()
-        self.stopconnection()
+        self.stopConnection()
         if data:  # if для транформации memoryview из БД в bytea для модели
             return ResponsePerevalModel(**{key: data[i].tobytes() if isinstance(data[i], memoryview) else data[i]
                                            for i, key in enumerate(ResponsePerevalModel.model_fields.keys())})
         else:
             return JSONResponse({'status': 204, 'message': 'Данные не найдены.'})
+
 
 
