@@ -2,8 +2,9 @@ import psycopg2
 from psycopg2 import Error
 from config import FSTR_DB_NAME, FSTR_DB_PORT, FSTR_DB_LOGIN, FSTR_DB_PASS, FSTR_DB_HOST
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from Data_class import Data
+from Data_class import Data, ResponsePerevalModel
 from DB_Requests import *
+from fastapi.responses import JSONResponse
 
 
 class Db:
@@ -53,7 +54,7 @@ class Db:
         try:
             self.makeconnection()
         except (Exception, Error) as error:
-            return {'status': 500, 'message': f'Ошибка подключения к базе данных - {error}', 'id': None}
+            return JSONResponse({'status': 500, 'message': f'Ошибка подключения к базе данных - {error}', 'id': None})
 
         # Добавление фотографий
 
@@ -98,17 +99,18 @@ class Db:
 
         self.stopconnection()
 
-        return {'status': 200, 'message': None, 'id': object_id}
+        return JSONResponse({'status': 200, 'message': None, 'id': object_id})
 
     def getData(self, data_id: int):
         """ Функция получения данных из базы """
         self.makeconnection()
         self.cur.execute(SELECT_DATA_BY_ID_FOR_GET_REQUEST, (data_id,))
-        response = self.cur.fetchone()
+        data = self.cur.fetchone()
         self.stopconnection()
-        if response:
-            return response
+        if data:  # if для транформации memoryview из БД в bytea для модели
+            return ResponsePerevalModel(**{key: data[i].tobytes() if isinstance(data[i], memoryview) else data[i]
+                                           for i, key in enumerate(ResponsePerevalModel.model_fields.keys())})
         else:
-            return None
+            return JSONResponse({'status': 204, 'message': 'Данные не найдены.'})
 
 
