@@ -70,9 +70,3 @@ class ResponsePerevalModel(BaseModel):
     img_1_data: Optional[bytes] = None
     img_2_title: Optional[str] = None
     img_2_data: Optional[bytes] = None
-
-    # @field_validator('img_0_data', mode='before')
-    # def validate_data(self, value):
-    #     if isinstance(value, memoryview):
-    #         return value.tobytes()
-    #     return value
