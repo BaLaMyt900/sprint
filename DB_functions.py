@@ -3,6 +3,7 @@ from psycopg2 import Error
 from config import FSTR_DB_NAME, FSTR_DB_PORT, FSTR_DB_LOGIN, FSTR_DB_PASS, FSTR_DB_HOST
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from Data_class import Data
+from DB_Requests import *
 
 
 class Db:
@@ -17,57 +18,16 @@ class Db:
             raise Error('Ошибка подключения к базе данных')
 
         """ Создание таблицы Users """
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS Users
-                        (
-                            id serial PRIMARY KEY,
-                            email text UNIQUE,
-                            phone integer UNIQUE,
-                            fam varchar(50) NOT NULL,
-                            name varchar(50) NOT NULL,
-                            oct varchar(50),
-                            CONSTRAINT User_unique UNIQUE (id, email)
-                        );
-                        ''')
+        self.cur.execute(ADD_USERS)
 
         """ Создание таблицы Coords """
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS Coords
-                        (
-                            id serial PRIMARY KEY,
-                            latitude float NOT NULL,
-                            longitude float NOT NULL,
-                            height integer NOT NULL
-                        );""")
+        self.cur.execute(ADD_COORDS)
 
         """ Создание таблицы pereval_images """
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS pereval_images
-                        (
-                            id serial PRIMARY KEY,
-                            title text,
-                            date timestamp DEFAULT CURRENT_TIMESTAMP,
-                            img bytea NOT NULL
-                        );''')
+        self.cur.execute(ADD_IMAGES)
 
         """ Создание таблицы pereval_added """
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS pereval_added
-                        (
-                            id serial PRIMARY KEY,
-                            status text DEFAULT 'new',
-                            beautyTitle text,
-                            title text,
-                            others_titles text,
-                            connect text,
-                            user_id int,
-                            image_0 int,
-                            image_1 int,
-                            image_2 int,
-                            date_added timestamp DEFAULT CURRENT_TIMESTAMP,
-                            coords int NOT NULL,
-							CONSTRAINT user_pk FOREIGN KEY (user_id) REFERENCES Users(id),
-                            CONSTRAINT coords_pk FOREIGN KEY (coords) REFERENCES Coords(id) ON DELETE CASCADE,
-                            CONSTRAINT image_0_fkey FOREIGN KEY (image_0) REFERENCES pereval_images(id) ON DELETE CASCADE,
-                            CONSTRAINT image_1_fkey FOREIGN KEY (image_1) REFERENCES pereval_images(id) ON DELETE CASCADE,
-                            CONSTRAINT image_2_fkey FOREIGN KEY (image_2) REFERENCES pereval_images(id) ON DELETE CASCADE
-                        );''')
+        self.cur.execute(ADD_DATA)
         self.cur.close()
         self.conn.close()
 
@@ -87,7 +47,7 @@ class Db:
         self.cur.close()
         self.conn.close()
 
-    def submitdata(self, data: Data):
+    def submitData(self, data: Data):
         """ Принятие новых данных """
 
         try:
@@ -98,45 +58,50 @@ class Db:
         # Добавление фотографий
 
         images_id = []
-        for image in data.images.root:
-            self.cur.execute('''INSERT INTO pereval_images (title, img) VALUES (%s, %s) RETURNING id''',
-                             (image.title, image.data,))
-            images_id.append(self.cur.fetchone())
+        if data.images.root:
+            for image in data.images.root:
+                self.cur.execute(INSERT_IMAGE,
+                                 (image.title, image.data,))
+                images_id.append(self.cur.fetchone())
 
         # Добавление координат
 
-        self.cur.execute('''INSERT INTO Coords (latitude, longitude, height) VALUES (%s, %s, %s) RETURNING id''',
+        self.cur.execute(INSERT_COORDS,
                          (data.coords.latitude, data.coords.longitude, data.coords.height,))
         coords_id = self.cur.fetchone()
 
         # Поиск или добавление пользователя
 
-        self.cur.execute(f'''SELECT id FROM Users WHERE email = %s''', (data.user.email,))
+        self.cur.execute(SELECT_USER_BY_EMAIL, (data.user.email,))
         user_id = self.cur.fetchone()
 
         # Добавление информации в pereval_added
 
         if user_id:  # Если пользователь найдет, добавление с имеющимся ИД
-            self.cur.execute(''' INSERT INTO pereval_added (beautyTitle, title, others_titles, connect, user_id,
-            coords) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id''',
+            self.cur.execute(INSERT_DATA_RETURN_ID,
                              (data.beauty_title, data.title, data.other_titles,
                               data.connect, user_id,
                               coords_id))
             object_id = self.cur.fetchone()
         else:  # Иначе добавление пользователя а потом уже информации
-            self.cur.execute(
-                ''' INSERT INTO Users (email, phone, fam, name, oct) VALUES (%s, %s, %s, %s, %s) RETURNING id''',
+            self.cur.execute(INSERT_USER_RETURN_ID,
                 (data.user.email, data.user.phone, data.user.fam, data.user.name, data.user.oct))
             user_id = self.cur.fetchone()
-            self.cur.execute(''' INSERT INTO pereval_added (beautyTitle, title, others_titles, connect, user_id, 
-            coords) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id''',
+            self.cur.execute(INSERT_DATA_RETURN_ID,
                              (data.beauty_title, data.title, data.other_titles,
                               data.connect, user_id, coords_id))
             object_id = self.cur.fetchone()
 
-        for id, image_id in enumerate(images_id):
-            self.cur.execute(f''' UPDATE pereval_added SET image_%s = %s WHERE id = %s''', (id, image_id, object_id))
+        if images_id:
+            for img_id, image_id in enumerate(images_id):
+                self.cur.execute(UPDATE_DATA_ADD_IMAGE_BY_IMG_ID, (img_id, image_id, object_id))
 
         self.stopconnection()
 
         return {'status': 200, 'message': None, 'id': object_id}
+
+    def getData(self, id):
+        self.makeconnection()
+        self.cur.execute(''' 
+        SELECT status, beautyTitle, title, others_titles, connect, 
+        ''')
