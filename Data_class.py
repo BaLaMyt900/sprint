@@ -1,5 +1,6 @@
-from pydantic import BaseModel, RootModel
-from typing import Union, List
+from pydantic import BaseModel, RootModel, field_validator, root_validator
+from typing import Union, List, Optional
+from datetime import datetime
 
 
 class User(BaseModel):
@@ -47,3 +48,31 @@ class Data(BaseModel):
     coords: Coords
     level: Level
     images: Images
+
+
+class ResponsePerevalModel(BaseModel):
+    status: str
+    email: str
+    fam: str
+    name: str
+    oct: str
+    beautytitle: str
+    pereval_title: str
+    others_titles: str
+    connect: str
+    date_added: datetime = None
+    latitude: float
+    longitude: float
+    height: int
+    img_0_title: Optional[str] = None
+    img_0_data: Optional[bytes] = None
+    img_1_title: Optional[str] = None
+    img_1_data: Optional[bytes] = None
+    img_2_title: Optional[str] = None
+    img_2_data: Optional[bytes] = None
+
+    # @field_validator('img_0_data', mode='before')
+    # def validate_data(self, value):
+    #     if isinstance(value, memoryview):
+    #         return value.tobytes()
+    #     return value

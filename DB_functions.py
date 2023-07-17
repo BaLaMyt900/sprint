@@ -1,3 +1,5 @@
+import json
+
 import psycopg2
 from psycopg2 import Error
 from config import FSTR_DB_NAME, FSTR_DB_PORT, FSTR_DB_LOGIN, FSTR_DB_PASS, FSTR_DB_HOST
@@ -100,8 +102,12 @@ class Db:
 
         return {'status': 200, 'message': None, 'id': object_id}
 
-    def getData(self, id):
+    def getData(self, data_id: int):
+        """ Функция получения данных из базы """
         self.makeconnection()
-        self.cur.execute(''' 
-        SELECT status, beautyTitle, title, others_titles, connect, 
-        ''')
+        self.cur.execute(SELECT_DATA_BY_ID_FOR_GET_REQUEST, (data_id,))
+        response = self.cur.fetchone()
+        self.stopconnection()
+        return response
+
+
