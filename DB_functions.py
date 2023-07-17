@@ -108,6 +108,9 @@ class Db:
         self.cur.execute(SELECT_DATA_BY_ID_FOR_GET_REQUEST, (data_id,))
         response = self.cur.fetchone()
         self.stopconnection()
-        return response
+        if response:
+            return response
+        else:
+            return None
 
 
