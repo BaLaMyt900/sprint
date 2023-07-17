@@ -3,7 +3,6 @@ from psycopg2 import Error
 from config import FSTR_DB_NAME, FSTR_DB_PORT, FSTR_DB_LOGIN, FSTR_DB_PASS, FSTR_DB_HOST
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from Data_class import Data
-from datetime import datetime
 
 
 class Db:
@@ -14,7 +13,7 @@ class Db:
 
         try:
             self.makeconnection()
-        except (Exception, Error) as error:
+        except (Exception, Error):
             raise Error('Ошибка подключения к базе данных')
 
         """ Создание таблицы Users """
@@ -83,7 +82,6 @@ class Db:
         except (Exception, Error) as error:
             raise error
 
-
     def stopconnection(self):
         """ Функция разрыва соединения с базой данных """
         self.cur.close()
@@ -142,4 +140,3 @@ class Db:
         self.stopconnection()
 
         return {'status': 200, 'message': None, 'id': object_id}
-
