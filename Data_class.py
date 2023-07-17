@@ -1,4 +1,4 @@
-from pydantic import BaseModel, RootModel, field_validator, root_validator
+from pydantic import BaseModel, RootModel
 from typing import Union, List, Optional
 from datetime import datetime
 
@@ -51,6 +51,7 @@ class Data(BaseModel):
 
 
 class ResponsePerevalModel(BaseModel):
+    """ Класс модуля предоставления данных для ГЕТ запроса """
     status: str
     email: str
     fam: str
