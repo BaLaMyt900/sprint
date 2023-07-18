@@ -57,8 +57,9 @@ class ResponsePerevalModel(BaseModel):
     fam: str
     name: str
     oct: str
-    beautytitle: str
-    pereval_title: str
+    phone: int
+    beauty_title: str
+    title: str
     others_titles: str
     connect: str
     date_added: datetime = None

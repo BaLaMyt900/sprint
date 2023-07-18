@@ -86,7 +86,7 @@ class Db:
             object_id = self.cur.fetchone()
         else:  # Иначе добавление пользователя а потом уже информации
             self.cur.execute(INSERT_USER_RETURN_ID,
-                (data.user.email, data.user.phone, data.user.fam, data.user.name, data.user.oct))
+                             (data.user.email, data.user.phone, data.user.fam, data.user.name, data.user.oct))
             user_id = self.cur.fetchone()
             self.cur.execute(INSERT_DATA_RETURN_ID,
                              (data.beauty_title, data.title, data.other_titles,
@@ -113,5 +113,24 @@ class Db:
         else:
             return JSONResponse({'status': 204, 'message': 'Данные не найдены.'})
 
+    def patchData(self, patch_id: int, data: Data):
+        """ Функция редактирования данных.
+         Условия: Данные находятся в статусе - new,
+         Нельзя редактировать пользователя"""
+        self.makeConnection()
+        self.cur.execute(SELECT_DATA_FOR_PATCH, (patch_id,))
+        oldData = self.cur.fetchone()
+        if oldData:
+            if oldData[0] != 'new':
+                """ Проверка на статус 'Новый' """
+                return JSONResponse({'state': 0, 'message': 'Данные не в статусе новых.'})
+            elif any([oldData[1] != data.user.email, oldData[2] != data.user.name, oldData[3] != data.user.fam,
+                      oldData[4] != data.user.oct, oldData[5] != data.user.phone]):
+                """ Проверка на соответсвие данных пользователя. """
+                return JSONResponse({'state': 0, 'message': 'Запрещено менять данные пользователя.'})
+        else:
+            """ Проверка нахождения данных по id """
+            return JSONResponse({'state': 0, 'message': 'Данные не найдены.'})
+        self.cur.execute()
 
 

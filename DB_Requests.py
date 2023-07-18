@@ -1,3 +1,6 @@
+""" Файл с заготовленными запросами в базу данных. """
+
+
 ADD_USERS = '''CREATE TABLE IF NOT EXISTS Users
                         (
                             id serial PRIMARY KEY,
@@ -50,7 +53,7 @@ INSERT_DATA_RETURN_ID = ''' INSERT INTO pereval_added (beautyTitle, title, other
             coords) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id'''
 INSERT_USER_RETURN_ID = ''' INSERT INTO Users (email, phone, fam, name, oct) VALUES (%s, %s, %s, %s, %s) RETURNING id'''
 UPDATE_DATA_ADD_IMAGE_BY_IMG_ID = ''' UPDATE pereval_added SET image_%s = %s WHERE id = %s'''
-SELECT_DATA_BY_ID_FOR_GET_REQUEST = '''select status, u.email, u.fam, u.name, u.oct, beautytitle,
+SELECT_DATA_BY_ID_FOR_GET_REQUEST = '''select status, u.email, u.fam, u.name, u.oct, u.phone, beautytitle,
                                        pereval_added.title, others_titles, connect, date_added,
                                        latitude, longitude, height, img_0.title, img_0.img, img_1.title,
                                        img_1.img, img_2.title, img_2.img
@@ -61,3 +64,13 @@ SELECT_DATA_BY_ID_FOR_GET_REQUEST = '''select status, u.email, u.fam, u.name, u.
                                        LEFT JOIN pereval_images img_1 on img_1.id = pereval_added.image_1
                                        LEFT JOIN pereval_images img_2 on img_2.id = pereval_added.image_2
                                        where pereval_added.id = %s;'''
+SELECT_DATA_FOR_PATCH = ''' SELECT status, u.email, u.name, u.fam, u.oct, u.phone 
+                            FROM pereval_added 
+                            join users u on u.id = pereval_added.user_id 
+                            join coords on pereval_added.coords = coords.id  
+                            LEFT JOIN pereval_images img_0 on img_0.id = pereval_added.image_0
+                            LEFT JOIN pereval_images img_1 on img_1.id = pereval_added.image_1
+                            LEFT JOIN pereval_images img_2 on img_2.id = pereval_added.image_2
+                            WHERE pereval_added.id = %s '''
+UPDATE_DATA_FOR_PATCH = '''UPDATE pereval_added
+                           SET (beautyTitle, title, others_titles, connect, latitude, longtitude)'''
