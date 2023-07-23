@@ -64,7 +64,7 @@ SELECT_DATA_BY_ID_FOR_GET_REQUEST = '''select status, u.email, u.fam, u.name, u.
                                        LEFT JOIN pereval_images img_1 on img_1.id = pereval_added.image_1
                                        LEFT JOIN pereval_images img_2 on img_2.id = pereval_added.image_2
                                        where pereval_added.id = %s;'''
-SELECT_DATA_FOR_PATCH = ''' SELECT status, u.email, u.name, u.fam, u.oct, u.phone 
+SELECT_DATA_FOR_PATCH = ''' SELECT status, u.email, u.name, u.fam, u.oct, u.phone, 
                             FROM pereval_added 
                             join users u on u.id = pereval_added.user_id 
                             join coords on pereval_added.coords = coords.id  
@@ -72,5 +72,6 @@ SELECT_DATA_FOR_PATCH = ''' SELECT status, u.email, u.name, u.fam, u.oct, u.phon
                             LEFT JOIN pereval_images img_1 on img_1.id = pereval_added.image_1
                             LEFT JOIN pereval_images img_2 on img_2.id = pereval_added.image_2
                             WHERE pereval_added.id = %s '''
-UPDATE_DATA_FOR_PATCH = '''UPDATE pereval_added
-                           SET (beautyTitle, title, others_titles, connect, latitude, longtitude)'''
+UPDATE_DATA_FOR_PATCH = '''UPDATE pereval_added pa
+                           SET beautytitle = %s, title = %s, others_titles = %s, connect = %s
+                           WHERE id = %s'''

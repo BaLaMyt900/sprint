@@ -9,7 +9,6 @@ from fastapi.responses import JSONResponse
 
 class Db:
     """ Класс для работы с базой данных """
-
     def __init__(self):
         """ Создание таблиц в базе данных """
 
@@ -123,7 +122,7 @@ class Db:
         if oldData:
             if oldData[0] != 'new':
                 """ Проверка на статус 'Новый' """
-                return JSONResponse({'state': 0, 'message': 'Данные не в статусе новых.'})
+                return JSONResponse({'state': 0, 'message': 'Запрещено изменять провернные данные.'})
             elif any([oldData[1] != data.user.email, oldData[2] != data.user.name, oldData[3] != data.user.fam,
                       oldData[4] != data.user.oct, oldData[5] != data.user.phone]):
                 """ Проверка на соответсвие данных пользователя. """
@@ -131,6 +130,9 @@ class Db:
         else:
             """ Проверка нахождения данных по id """
             return JSONResponse({'state': 0, 'message': 'Данные не найдены.'})
-        self.cur.execute()
+        """ Обновление названия данных """
+        self.cur.execute(UPDATE_DATA_FOR_PATCH, (data.beauty_title, data.title,
+                                                 data.other_titles, data.connect, patch_id))
+
 
 
