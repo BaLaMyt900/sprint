@@ -64,14 +64,25 @@ SELECT_DATA_BY_ID_FOR_GET_REQUEST = '''select status, u.email, u.fam, u.name, u.
                                        LEFT JOIN pereval_images img_1 on img_1.id = pereval_added.image_1
                                        LEFT JOIN pereval_images img_2 on img_2.id = pereval_added.image_2
                                        where pereval_added.id = %s;'''
-SELECT_DATA_FOR_PATCH = ''' SELECT status, u.email, u.name, u.fam, u.oct, u.phone, 
-                            FROM pereval_added 
-                            join users u on u.id = pereval_added.user_id 
-                            join coords on pereval_added.coords = coords.id  
-                            LEFT JOIN pereval_images img_0 on img_0.id = pereval_added.image_0
-                            LEFT JOIN pereval_images img_1 on img_1.id = pereval_added.image_1
-                            LEFT JOIN pereval_images img_2 on img_2.id = pereval_added.image_2
-                            WHERE pereval_added.id = %s '''
+SELECT_DATA_FOR_PATCH = '''SELECT status, u.email, u.name, u.fam, u.oct, u.phone,
+                           coords, latitude, longitude, height, 
+                           image_0, img_0.title, img_0.img,
+                           image_1, img_1.title, img_1.img, 
+                           image_2, img_2.title, img_2.img 
+                           FROM pereval_added 
+                           LEFT JOIN users u on u.id = pereval_added.user_id 
+                           LEFT JOIN coords on pereval_added.coords = coords.id  
+                           LEFT JOIN pereval_images img_0 on img_0.id = pereval_added.image_0
+                           LEFT JOIN pereval_images img_1 on img_1.id = pereval_added.image_1
+                           LEFT JOIN pereval_images img_2 on img_2.id = pereval_added.image_2
+                           WHERE pereval_added.id = %s '''
 UPDATE_DATA_FOR_PATCH = '''UPDATE pereval_added pa
-                           SET beautytitle = %s, title = %s, others_titles = %s, connect = %s
+                           SET beautytitle = %s, title = %s, others_titles = %s, connect = %s, image_0 = %s, 
+                               image_1 = %s, image_2 = %s
                            WHERE id = %s'''
+UPDATE_COORDS_FOR_PATCH = '''UPDATE coords
+                             SET latitude = %s, longitude = %s, height = %s
+                             WHERE id = %s'''
+UPDATE_PHOTO_FOR_PATCH = '''UPDATE pereval_images
+                            SET title = %s, img = %s
+                            WHERE id = %s'''

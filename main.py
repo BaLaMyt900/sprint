@@ -6,6 +6,7 @@ db = Db()
 app = FastAPI()
 
 
+
 @app.post('/submitData', response_model=Data)
 async def submitData(data: Data):
     """ ПОСТ запрос для добавления данных """

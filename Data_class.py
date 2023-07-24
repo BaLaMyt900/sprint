@@ -1,5 +1,5 @@
 from pydantic import BaseModel, RootModel
-from typing import Union, List, Optional, NamedTuple
+from typing import Union, List, Optional
 from datetime import datetime
 
 

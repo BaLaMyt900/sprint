@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 
 class Db:
     """ Класс для работы с базой данных """
+
     def __init__(self):
         """ Создание таблиц в базе данных """
 
@@ -112,6 +113,15 @@ class Db:
         else:
             return JSONResponse({'status': 204, 'message': 'Данные не найдены.'})
 
+    def _updatePhoto(self, img_id: int, old_title: str, old_data: bytes, new_title: str, new_data: bytes):
+        """ Внутренний метод сравнения и обновления фотографий. """
+        if all([img_id, any([old_title != new_title, old_data != new_data])]):
+            self.cur.execute(UPDATE_PHOTO_FOR_PATCH, (new_title, new_data, img_id))
+            return img_id
+        elif not img_id:
+            self.cur.execute(INSERT_IMAGE, (new_title, new_data))
+            return self.cur.fetchone()
+
     def patchData(self, patch_id: int, data: Data):
         """ Функция редактирования данных.
          Условия: Данные находятся в статусе - new,
@@ -131,8 +141,38 @@ class Db:
             """ Проверка нахождения данных по id """
             return JSONResponse({'state': 0, 'message': 'Данные не найдены.'})
         """ Обновление названия данных """
+        if any([oldData[7] != data.coords.latitude,
+                oldData[8] != data.coords.longitude, oldData[9] != data.coords.height]):
+            """ Проверка и изменение кординат """
+            self.cur.execute(UPDATE_COORDS_FOR_PATCH, (data.coords.latitude, data.coords.longitude,
+                                                       data.coords.height, oldData[6]))
+        """ Провека и изменение фотографий без изменения даты """
+        # Первая фотография
+        img_0 = oldData[10]
+        try:
+            if data.images.root[0]:
+                img_0 = self._updatePhoto(img_0, oldData[11], oldData[12],
+                                          data.images.root[0].title, data.images.root[0].data)
+        except IndexError:
+            pass
+        # Вторая фотография
+        img_1 = oldData[13]
+        try:
+            if data.images.root[1]:
+                img_1 = self._updatePhoto(img_1, oldData[14], oldData[15],
+                                          data.images.root[1].title, data.images.root[1].data)
+        except IndexError:
+            pass
+        # Третья фотография
+        img_2 = oldData[16]
+        try:
+            if data.images.root[2]:
+                img_2 = self._updatePhoto(img_2, oldData[17], oldData[18],
+                                          data.images.root[2].title, data.images.root[2].data)
+        except IndexError:
+            pass
+
         self.cur.execute(UPDATE_DATA_FOR_PATCH, (data.beauty_title, data.title,
-                                                 data.other_titles, data.connect, patch_id))
-
-
-
+                                                 data.other_titles, data.connect,
+                                                 img_0, img_1, img_2, patch_id))
+        return JSONResponse({'state': 1, 'message': None})
