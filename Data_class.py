@@ -72,3 +72,26 @@ class ResponsePerevalModel(BaseModel):
     img_1_data: Optional[bytes] = None
     img_2_title: Optional[str] = None
     img_2_data: Optional[bytes] = None
+
+class ResponsePerevalByEmail(BaseModel):
+    """ Модель запроса по email пользователя """
+    status: str
+    beauty_title: str
+    title: str
+    others_titles: str
+    connect: str
+    date_added: datetime = None
+    latitude: float
+    longitude: float
+    height: int
+    img_0_title: Optional[str] = None
+    img_0_data: Optional[bytes] = None
+    img_1_title: Optional[str] = None
+    img_1_data: Optional[bytes] = None
+    img_2_title: Optional[str] = None
+    img_2_data: Optional[bytes] = None
+
+
+class ResponsePerevalByEmailList(BaseModel):
+    """ Лист моделей полученных при поиске по email """
+    root: List[ResponsePerevalByEmail]

@@ -175,4 +175,16 @@ class Db:
         self.cur.execute(UPDATE_DATA_FOR_PATCH, (data.beauty_title, data.title,
                                                  data.other_titles, data.connect,
                                                  img_0, img_1, img_2, patch_id))
+        self.stopConnection()
         return JSONResponse({'state': 1, 'message': None})
+
+    def getByEmail(self, email: str):
+        """ Получение данных по email пользователя. """
+        self.makeConnection()
+        self.cur.execute(SELECT_USER_BY_EMAIL, (email,))
+        user_id = self.cur.fetchone()
+        if not user_id:
+            return JSONResponse({'status': 0, 'message': 'Пользователь не найден.'})
+        self.cur.execute(SELECT_DATA_FOR_SEARCH_BY_USER_ID, (user_id,))
+        data_list = self.cur.fetchall()
+        return JSONResponse(data_list)

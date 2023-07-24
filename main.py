@@ -1,10 +1,9 @@
 from fastapi import FastAPI
 from DB_functions import Db
-from Data_class import Data, ResponsePerevalModel
+from Data_class import Data, ResponsePerevalModel, ResponsePerevalByEmailList
 
 db = Db()
 app = FastAPI()
-
 
 
 @app.post('/submitData', response_model=Data)
@@ -22,3 +21,9 @@ async def getData(get_id: int):
 @app.patch('/submitData/<id>', response_model=Data)
 async def patchData(patch_id: int, data: Data):
     return db.patchData(patch_id, data)
+
+
+@app.get('/submitData/', response_model=ResponsePerevalByEmailList)
+async def getForEmail(email: str):
+    """ Поиск данных по email пользователя. """
+    return db.getByEmail(email)

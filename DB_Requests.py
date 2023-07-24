@@ -86,3 +86,16 @@ UPDATE_COORDS_FOR_PATCH = '''UPDATE coords
 UPDATE_PHOTO_FOR_PATCH = '''UPDATE pereval_images
                             SET title = %s, img = %s
                             WHERE id = %s'''
+SELECT_DATA_FOR_SEARCH_BY_USER_ID = '''SELECT status, beautytitle, pa.title, pa.others_titles, pa.connect,
+                           pa.date_added, latitude, longitude, height, 
+                           img_0.title, img_0.img,
+                           img_1.title, img_1.img, 
+                           img_2.title, img_2.img 
+                           FROM pereval_added pa
+                           LEFT JOIN users u on u.id = pa.user_id 
+                           LEFT JOIN coords on pa.coords = coords.id  
+                           LEFT JOIN pereval_images img_0 on img_0.id = pa.image_0
+                           LEFT JOIN pereval_images img_1 on img_1.id = pa.image_1
+                           LEFT JOIN pereval_images img_2 on img_2.id = pa.image_2
+                           WHERE u.id = %s'''
+SELECT_USER_BY_EMAIL = '''SELECT id FROM users WHERE email = %s'''
