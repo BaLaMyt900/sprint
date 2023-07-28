@@ -8,22 +8,28 @@ app = FastAPI()
 
 @app.post('/submitData', response_model=Data)
 async def submitData(data: Data):
-    """ ПОСТ запрос для добавления данных """
+    """ Добавление данных в базу. Автоматически добавляет время и статус.
+     Если пользователь новый, То его так же добаляет в базу."""
     return db.submitData(data)
 
 
 @app.get('/submitData/<id>', response_model=ResponsePerevalModel)
 async def getData(get_id: int):
-    """ ГЕТ запрос данных из БД согласно форме для предоставления """
+    """ Запрос данных из базы. Необходим ID записи.
+    Предоставляет информацию согласно форме, с отображением времени и статуса. """
     return db.getData(get_id)
 
 
 @app.patch('/submitData/<id>', response_model=Data)
 async def patchData(patch_id: int, data: Data):
+    """ Обновление записи базы данных. Запрашивает ID изменяемой записи и данные,
+     согласно форме добаления.
+     Запрещено менять данные пользователя, Запрещено менять данные, если статус не NEW"""
     return db.patchData(patch_id, data)
 
 
-@app.get('/submitData/', response_model=ResponsePerevalByEmailList)
+@app.get('/submitData/?email=<email>', response_model=ResponsePerevalByEmailList)
 async def getForEmail(email: str):
-    """ Поиск данных по email пользователя. """
+    """ Поиск и получение данных по email-адресу пользователя.
+    Отработаны ошибки о ненахождении пользователя и данных."""
     return db.getByEmail(email)
