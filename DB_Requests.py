@@ -98,4 +98,3 @@ SELECT_DATA_FOR_SEARCH_BY_USER_ID = '''SELECT pa.id, status, beautytitle, pa.tit
                            LEFT JOIN pereval_images img_1 on img_1.id = pa.image_1
                            LEFT JOIN pereval_images img_2 on img_2.id = pa.image_2
                            WHERE u.id = %s'''
-SELECT_USER_BY_EMAIL = '''SELECT id FROM users WHERE email = %s'''

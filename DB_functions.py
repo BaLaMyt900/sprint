@@ -12,7 +12,6 @@ class Db:
 
     def __init__(self):
         """ Создание таблиц в базе данных """
-
         try:
             self.makeConnection()
         except (Exception, Error):
@@ -105,10 +104,16 @@ class Db:
 
     def getData(self, data_id: int):
         """ Функция получения данных из базы """
-        self.makeConnection()
+        try:
+            self.makeConnection()
+        except (Exception, Error) as error:
+            return JSONResponse({'status': 500, 'message': f'Ошибка подключения к базе данных - {error}', 'id': None})
+
         self.cur.execute(SELECT_DATA_BY_ID_FOR_GET_REQUEST, (data_id,))
         data = self.cur.fetchone()
+
         self.stopConnection()
+
         if data:  # if для транформации memoryview из БД в bytea для модели
             return ResponsePerevalModel(**{key: data[i].tobytes() if isinstance(data[i], memoryview) else data[i]
                                            for i, key in enumerate(ResponsePerevalModel.model_fields.keys())})
@@ -128,7 +133,12 @@ class Db:
         """ Функция редактирования данных.
          Условия: Данные находятся в статусе - new,
          Нельзя редактировать пользователя"""
-        self.makeConnection()
+
+        try:
+            self.makeConnection()
+        except (Exception, Error) as error:
+            return JSONResponse({'status': 500, 'message': f'Ошибка подключения к базе данных - {error}', 'id': None})
+
         self.cur.execute(SELECT_DATA_FOR_PATCH, (patch_id,))
         oldData = self.cur.fetchone()
         if oldData:
@@ -157,6 +167,7 @@ class Db:
                                           data.images.root[0].title, data.images.root[0].data)
         except IndexError:
             pass
+
         # Вторая фотография
         img_1 = oldData[13]
         try:
@@ -165,6 +176,7 @@ class Db:
                                           data.images.root[1].title, data.images.root[1].data)
         except IndexError:
             pass
+
         # Третья фотография
         img_2 = oldData[16]
         try:
@@ -182,7 +194,11 @@ class Db:
 
     def getByEmail(self, email: str):
         """ Получение данных по email пользователя. """
-        self.makeConnection()
+        try:
+            self.makeConnection()
+        except (Exception, Error) as error:
+            return JSONResponse({'status': 500, 'message': f'Ошибка подключения к базе данных - {error}', 'id': None})
+
         self.cur.execute(SELECT_USER_BY_EMAIL, (email,))
         user_id = self.cur.fetchone()
         if not user_id:
