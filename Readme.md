@@ -82,3 +82,31 @@ Swagger доступен по пути: http://127.0.0.1:8000/docs#/
 
 #### GET /submitData/?email=email
 Метод получения списка данных, отправленных пользователем. 
+Пример полученных данных:
+```json
+{
+  "status": 1,
+  "data": {
+    "root": [
+      {
+        "id": 3,
+        "status": "new",
+        "beauty_title": "string",
+        "title": "string",
+        "others_titles": "string",
+        "connect": "string",
+        "date_added": "2023-07-28T07:33:20.826065",
+        "latitude": 0,
+        "longitude": 0,
+        "height": 0,
+        "img_0_title": "string",
+        "img_0_data": "string",
+        "img_1_title": null,
+        "img_1_data": null,
+        "img_2_title": null,
+        "img_2_data": null
+      }
+    ]
+  }
+}
+```
