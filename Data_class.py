@@ -73,6 +73,7 @@ class ResponsePerevalModel(BaseModel):
     img_2_title: Optional[str] = None
     img_2_data: Optional[bytes] = None
 
+
 class ResponsePerevalByEmail(BaseModel):
     """ Модель запроса по email пользователя """
     status: str
@@ -92,6 +93,6 @@ class ResponsePerevalByEmail(BaseModel):
     img_2_data: Optional[bytes] = None
 
 
-class ResponsePerevalByEmailList(BaseModel):
+class ResponsePerevalByEmailList(RootModel):
     """ Лист моделей полученных при поиске по email """
     root: List[ResponsePerevalByEmail]
