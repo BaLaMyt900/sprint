@@ -86,7 +86,7 @@ UPDATE_COORDS_FOR_PATCH = '''UPDATE coords
 UPDATE_PHOTO_FOR_PATCH = '''UPDATE pereval_images
                             SET title = %s, img = %s
                             WHERE id = %s'''
-SELECT_DATA_FOR_SEARCH_BY_USER_ID = '''SELECT status, beautytitle, pa.title, pa.others_titles, pa.connect,
+SELECT_DATA_FOR_SEARCH_BY_USER_ID = '''SELECT pa.id, status, beautytitle, pa.title, pa.others_titles, pa.connect,
                            pa.date_added, latitude, longitude, height, 
                            img_0.title, img_0.img,
                            img_1.title, img_1.img, 

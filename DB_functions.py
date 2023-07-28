@@ -198,4 +198,4 @@ class Db:
         for item in data_list:
             output_data.append({key: item[i].tobytes() if isinstance(item[i], memoryview) else item[i]
                                 for i, key in enumerate(ResponsePerevalByEmail.model_fields.keys())})
-        return JSONResponse({'status': 1, 'data': ResponsePerevalByEmailList(root=output_data)})
+        return JSONResponse({'status': 1, 'data': ResponsePerevalByEmailList(root=output_data).model_dump(mode='json')})
