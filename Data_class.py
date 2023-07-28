@@ -73,8 +73,10 @@ class ResponsePerevalModel(BaseModel):
     img_2_title: Optional[str] = None
     img_2_data: Optional[bytes] = None
 
+
 class ResponsePerevalByEmail(BaseModel):
     """ Модель запроса по email пользователя """
+    id: int
     status: str
     beauty_title: str
     title: str

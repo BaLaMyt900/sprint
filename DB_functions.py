@@ -2,7 +2,7 @@ import psycopg2
 from psycopg2 import Error
 from config import FSTR_DB_NAME, FSTR_DB_PORT, FSTR_DB_LOGIN, FSTR_DB_PASS, FSTR_DB_HOST
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from Data_class import Data, ResponsePerevalModel
+from Data_class import Data, ResponsePerevalModel, ResponsePerevalByEmail, ResponsePerevalByEmailList
 from DB_Requests import *
 from fastapi.responses import JSONResponse
 
@@ -186,7 +186,16 @@ class Db:
         self.cur.execute(SELECT_USER_BY_EMAIL, (email,))
         user_id = self.cur.fetchone()
         if not user_id:
+            """ Проверка нахождения пользователя """
             return JSONResponse({'status': 0, 'message': 'Пользователь не найден.'})
         self.cur.execute(SELECT_DATA_FOR_SEARCH_BY_USER_ID, (user_id,))
         data_list = self.cur.fetchall()
-        return JSONResponse(data_list)
+        self.stopConnection()
+        if not data_list:
+            """ Проверка наличия выходных данных """
+            return JSONResponse({'status': 0, 'message': 'Данные не найдены.'})
+        output_data = []
+        for item in data_list:
+            output_data.append({key: item[i].tobytes() if isinstance(item[i], memoryview) else item[i]
+                                for i, key in enumerate(ResponsePerevalByEmail.model_fields.keys())})
+        return JSONResponse({'status': 1, 'data': ResponsePerevalByEmailList(root=output_data).model_dump(mode='json')})
