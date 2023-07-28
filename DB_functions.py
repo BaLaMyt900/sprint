@@ -60,6 +60,8 @@ class Db:
 
         images_id = []
         if data.images.root:
+            if len(data.images.root) > 3:
+                return JSONResponse({'status': 500, 'message': 'Слишком много фотографий. Максимально 3.'})
             for image in data.images.root:
                 self.cur.execute(INSERT_IMAGE,
                                  (image.title, image.data,))
