@@ -13,14 +13,14 @@ async def submitData(data: Data):
     return db.submitData(data)
 
 
-@app.get('/submitData/<id>', response_model=ResponsePerevalModel)
+@app.get('/submitData/<get_id>', response_model=ResponsePerevalModel)
 async def getData(get_id: int):
     """ Запрос данных из базы. Необходим ID записи.
     Предоставляет информацию согласно форме, с отображением времени и статуса. """
     return db.getData(get_id)
 
 
-@app.patch('/submitData/<id>', response_model=Data)
+@app.patch('/submitData/<patch_id>', response_model=Data)
 async def patchData(patch_id: int, data: Data):
     """ Обновление записи базы данных. Запрашивает ID изменяемой записи и данные,
      согласно форме добаления.
