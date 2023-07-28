@@ -7,8 +7,6 @@
 - uvicorn
 - psycopg2
 - pydantic
-- pytest
-- httpx
 
 Swagger доступен по пути: http://127.0.0.1:8000/docs#/<br>
 Тестовый сервер размещен по адресу: http://185.139.70.198:8080/docs#
