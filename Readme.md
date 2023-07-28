@@ -7,9 +7,11 @@
 - uvicorn
 - psycopg2
 - pydantic
+- pytest
+- httpx
 
-Swagger доступен по пути: http://127.0.0.1:8000/docs#/
-
+Swagger доступен по пути: http://127.0.0.1:8000/docs#/<br>
+Добавлены тесты.
 ### Реализованные методы:
  
 #### POST: /submitData
