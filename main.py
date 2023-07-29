@@ -9,7 +9,7 @@ app = FastAPI()
 @app.post('/submitData', response_model=Data)
 async def submitData(data: Data):
     """ Добавление данных в базу. Автоматически добавляет время и статус.
-     Если пользователь новый, То его так же добаляет в базу."""
+     Если пользователь новый, то его так же добаляет в базу."""
     return db.submitData(data)
 
 
