@@ -13,14 +13,14 @@ async def submitData(data: Data):
     return db.submitData(data)
 
 
-@app.get('/submitData/{get_id}', response_model=ResponsePerevalModel)
+@app.get('/submitData<get_id>', response_model=ResponsePerevalModel)
 async def getData(get_id: int):
     """ Запрос данных из базы. Необходим ID записи.
     Предоставляет информацию согласно форме, с отображением времени и статуса. """
     return db.getData(get_id)
 
 
-@app.patch('/submitData/{patch_id}', response_model=Data)
+@app.patch('/submitData', response_model=Data)
 async def patchData(patch_id: int, data: Data):
     """ Обновление записи базы данных. Запрашивает ID изменяемой записи и данные,
      согласно форме добаления.
@@ -28,8 +28,8 @@ async def patchData(patch_id: int, data: Data):
     return db.patchData(patch_id, data)
 
 
-@app.get('/submitData/user_email={email}', response_model=ResponsePerevalByEmailList)
-async def getForEmail(email: str):
+@app.get('/submitData<user_email>', response_model=ResponsePerevalByEmailList)
+async def getForEmail(user_email: str):
     """ Поиск и получение данных по email-адресу пользователя.
     Отработаны ошибки о ненахождении пользователя и данных."""
-    return db.getByEmail(email)
+    return db.getByEmail(user_email)
