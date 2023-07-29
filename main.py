@@ -28,7 +28,7 @@ async def patchData(patch_id: int, data: Data):
     return db.patchData(patch_id, data)
 
 
-@app.get('/submitData/<email>', response_model=ResponsePerevalByEmailList)
+@app.get('/submitData/?user_email=<email>', response_model=ResponsePerevalByEmailList)
 async def getForEmail(email: str):
     """ Поиск и получение данных по email-адресу пользователя.
     Отработаны ошибки о ненахождении пользователя и данных."""
