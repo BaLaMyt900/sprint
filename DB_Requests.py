@@ -3,7 +3,7 @@
 
 ADD_USERS = '''CREATE TABLE IF NOT EXISTS Users
                         (
-                            id serial PRIMARY KEY,
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
                             email text UNIQUE,
                             phone integer UNIQUE,
                             fam varchar(50) NOT NULL,
@@ -14,21 +14,21 @@ ADD_USERS = '''CREATE TABLE IF NOT EXISTS Users
                         '''
 ADD_COORDS = """CREATE TABLE IF NOT EXISTS Coords
                         (
-                            id serial PRIMARY KEY,
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
                             latitude float NOT NULL,
                             longitude float NOT NULL,
                             height integer NOT NULL
                         );"""
 ADD_IMAGES = '''CREATE TABLE IF NOT EXISTS pereval_images
                         (
-                            id serial PRIMARY KEY,
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
                             title text,
                             date timestamp DEFAULT CURRENT_TIMESTAMP,
                             img bytea NOT NULL
                         );'''
 ADD_DATA = '''CREATE TABLE IF NOT EXISTS pereval_added
                         (
-                            id serial PRIMARY KEY,
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
                             status text DEFAULT 'new',
                             beautyTitle text,
                             title text,
@@ -46,13 +46,13 @@ ADD_DATA = '''CREATE TABLE IF NOT EXISTS pereval_added
                             CONSTRAINT image_1_fkey FOREIGN KEY (image_1) REFERENCES pereval_images(id) ON DELETE CASCADE,
                             CONSTRAINT image_2_fkey FOREIGN KEY (image_2) REFERENCES pereval_images(id) ON DELETE CASCADE
                         );'''
-INSERT_IMAGE = '''INSERT INTO pereval_images (title, img) VALUES (%s, %s) RETURNING id'''
-INSERT_COORDS = '''INSERT INTO Coords (latitude, longitude, height) VALUES (%s, %s, %s) RETURNING id'''
-SELECT_USER_BY_EMAIL = '''SELECT id FROM Users WHERE email = %s'''
-INSERT_DATA_RETURN_ID = ''' INSERT INTO pereval_added (beautyTitle, title, others_titles, connect, user_id,
-            coords) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id'''
-INSERT_USER_RETURN_ID = ''' INSERT INTO Users (email, phone, fam, name, oct) VALUES (%s, %s, %s, %s, %s) RETURNING id'''
-UPDATE_DATA_ADD_IMAGE_BY_IMG_ID = ''' UPDATE pereval_added SET image_%s = %s WHERE id = %s'''
+INSERT_IMAGE = '''INSERT INTO pereval_images (title, img) VALUES (?, ?)'''
+INSERT_COORDS = '''INSERT INTO Coords (latitude, longitude, height) VALUES (?, ?, ?)'''
+SELECT_USER_BY_EMAIL = '''SELECT id FROM Users WHERE email = ?'''
+INSERT_DATA = ''' INSERT INTO pereval_added (beautyTitle, title, others_titles, connect, user_id,
+            coords) VALUES (?, ?, ?, ?, ?, ?)'''
+INSERT_USER = ''' INSERT INTO Users (email, phone, fam, name, oct) VALUES (?, ?, ?, ?, ?)'''
+UPDATE_DATA_ADD_IMAGE_BY_IMG_ID = ''' UPDATE pereval_added SET %s = ? WHERE id = ?'''
 SELECT_DATA_BY_ID_FOR_GET_REQUEST = '''select status, u.email, u.fam, u.name, u.oct, u.phone, beautytitle,
                                        pereval_added.title, others_titles, connect, date_added,
                                        latitude, longitude, height, img_0.title, img_0.img, img_1.title,
@@ -63,7 +63,17 @@ SELECT_DATA_BY_ID_FOR_GET_REQUEST = '''select status, u.email, u.fam, u.name, u.
                                        LEFT JOIN pereval_images img_0 on img_0.id = pereval_added.image_0
                                        LEFT JOIN pereval_images img_1 on img_1.id = pereval_added.image_1
                                        LEFT JOIN pereval_images img_2 on img_2.id = pereval_added.image_2
-                                       where pereval_added.id = %s;'''
+                                       where pereval_added.id = ?'''
+SELECT_DATA_ALL = '''select pa.id, pa.status, u.email, u.fam, u.name, u.oct, u.phone, pa.beautytitle,
+                                       pa.title, pa.others_titles, pa.connect, pa.date_added,
+                                       latitude, longitude, height, img_0.title, img_0.img, img_1.title,
+                                       img_1.img, img_2.title, img_2.img
+                                       from pereval_added pa
+                                       join users u on u.id = pa.user_id
+                                       join coords on pa.coords = coords.id
+                                       LEFT JOIN pereval_images img_0 on img_0.id = pa.image_0
+                                       LEFT JOIN pereval_images img_1 on img_1.id = pa.image_1
+                                       LEFT JOIN pereval_images img_2 on img_2.id = pa.image_2'''
 SELECT_DATA_FOR_PATCH = '''SELECT status, u.email, u.name, u.fam, u.oct, u.phone,
                            coords, latitude, longitude, height, 
                            image_0, img_0.title, img_0.img,
@@ -75,17 +85,17 @@ SELECT_DATA_FOR_PATCH = '''SELECT status, u.email, u.name, u.fam, u.oct, u.phone
                            LEFT JOIN pereval_images img_0 on img_0.id = pereval_added.image_0
                            LEFT JOIN pereval_images img_1 on img_1.id = pereval_added.image_1
                            LEFT JOIN pereval_images img_2 on img_2.id = pereval_added.image_2
-                           WHERE pereval_added.id = %s '''
-UPDATE_DATA_FOR_PATCH = '''UPDATE pereval_added pa
-                           SET beautytitle = %s, title = %s, others_titles = %s, connect = %s, image_0 = %s, 
-                               image_1 = %s, image_2 = %s
-                           WHERE id = %s'''
+                           WHERE pereval_added.id = ? '''
+UPDATE_DATA_FOR_PATCH = '''UPDATE pereval_added
+                           SET beautytitle = ?, title = ?, others_titles = ?, connect = ?, image_0 = ?, 
+                               image_1 = ?, image_2 = ?
+                           WHERE id = ?'''
 UPDATE_COORDS_FOR_PATCH = '''UPDATE coords
-                             SET latitude = %s, longitude = %s, height = %s
-                             WHERE id = %s'''
+                             SET latitude = ?, longitude = ?, height = ?
+                             WHERE id = ?'''
 UPDATE_PHOTO_FOR_PATCH = '''UPDATE pereval_images
-                            SET title = %s, img = %s
-                            WHERE id = %s'''
+                            SET title = ?, img = ?
+                            WHERE id = ?'''
 SELECT_DATA_FOR_SEARCH_BY_USER_ID = '''SELECT pa.id, status, beautytitle, pa.title, pa.others_titles, pa.connect,
                            pa.date_added, latitude, longitude, height, 
                            img_0.title, img_0.img,
@@ -97,4 +107,7 @@ SELECT_DATA_FOR_SEARCH_BY_USER_ID = '''SELECT pa.id, status, beautytitle, pa.tit
                            LEFT JOIN pereval_images img_0 on img_0.id = pa.image_0
                            LEFT JOIN pereval_images img_1 on img_1.id = pa.image_1
                            LEFT JOIN pereval_images img_2 on img_2.id = pa.image_2
-                           WHERE u.id = %s'''
+                           WHERE u.id = ?'''
+DELETE_DATA_BY_EMAIL_AND_ID = '''DELETE FROM pereval_added
+                                 WHERE user_id IN(SELECT id FROM Users
+                                 WHERE email = ?) AND id = ?'''
